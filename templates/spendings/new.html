@@ -1,0 +1,23 @@
+
+<h1>New Spendings</h1>
+
+<form method="POST" class="pure-form pure-form-aligned" action="/spendings/">
+    <fieldset>
+        <div>
+            <label for="begin_date">Begin date:</label>
+            <input type="date" id="begin_date" name="begin_date" placeholder="Begin date">
+        </div>
+        <div>
+            <label for="end_date">End date:</label>
+            <input type="date" id="end_date" name="end_date" placeholder="End date">
+        </div>
+
+        <div>
+            <label for="spendings">Paste your spendings:</label>
+            <textarea
+                    style="max-width: 100%; width: 100%; height: 800px;" id="spendings" name="spendings" placeholder="">yo</textarea>
+        </div>
+    </fieldset>
+
+    <button type="submit" class="pure-button pure-button-primary">Submit</button>
+</form>

@@ -1,0 +1,10 @@
+# created by virtualenv automatically
+
+pyvenv.cfg
+bin/
+include/
+lib/python3.10
+
+**/**/__pycache__/
+
+db/spendings.db
