@@ -1,0 +1,75 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+<h1>Submission</h1>
+
+<form method="POST" class="pure-form pure-form-aligned" action="/spendings/submit">
+    {% for entry in result %}
+        <fieldset>
+            <div>
+                <b>
+                    {{ entry['id'] }}
+
+                    {% if entry['status'] == 'success' %}
+                        <span style="color: green;">Valid</span>
+                    {% else %}
+                        <span style="color: red;">No match</span>
+                    {% endif %}
+                </b>
+
+            </div>
+            <div>
+                <label for="{{ entry['id'] }}_rule_pattern">Rule pattern:</label>
+                <input type="text"
+                       id="{{ entry['id'] }}_rule_pattern"
+                       name="submission[{{ entry['id'] }}][rule_pattern]"
+                       value="{{ entry['result']['rule'] }}"
+                       placeholder="" />
+            </div>
+            <div>
+                <label for="{{ entry['id'] }}_category">Category:</label>
+                <select id="{{ entry['id'] }}_category" name="submission[{{ entry['id'] }}][category]">
+                    {% for category in categories %}
+                        <option value="{{ category }}"
+                                {% if entry['result']['category'] == category %}
+                                    selected
+                                {% endif %}
+                        >
+                            {{ category }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="{{ entry['id'] }}_date">Date:</label>
+                <input type="date"
+                       id="{{ entry['id'] }}_date"
+                       name="submission[{{ entry['id'] }}][date]"
+                       value="2023-04-23"
+                       placeholder="" />
+            </div>
+            <div>
+                <label for="{{ entry['id'] }}_description">Description:</label>
+                <input type="text"
+                       id="{{ entry['id'] }}_description"
+                       name="submission[{{ entry['id'] }}][description]"
+                       value="{{ entry['line'] }}"
+                       placeholder="" />
+            </div>
+            <div>
+                <label for="{{ entry['id'] }}_amount">Amount:</label>
+                <input type="text"
+                       id="{{ entry['id'] }}_amount"
+                       name="submission[{{ entry['id'] }}][amount]"
+                       value=""
+                       placeholder="" />
+            </div>
+        </fieldset>
+    {% endfor %}
+
+    <input type="hidden" name="nb_submissions" value="{{ nb_submissions }}" />
+    <button type="submit" class="pure-button pure-button-primary">Submit</button>
+</form>
+
+{% endblock %}

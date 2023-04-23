@@ -1,14 +1,73 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>mini-spend-tracker</title>
-</head>
-<body>
+{% extends 'layout.html' %}
+
+{% block body %}
 
 <p>
     <a href="/spendings/new">Add new spendings</a>
 </p>
 
+<div id="container-current-month">
 
-</body>
-</html>
+</div>
+
+<script>
+    Highcharts.chart('container-current-month', {
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+    },
+    title: {
+        useHTML: true,
+        text: 'Current month spendings',
+        align: 'left'
+    },
+    subtitle: {
+        text: '',
+        align: 'left'
+    },
+    accessibility: {
+        point: {
+            valueSuffix: '%'
+        }
+    },
+    yAxis: {
+        labels: {
+            format: '{value}%'
+        },
+        title: {
+            enabled: false
+        }
+    },
+    tooltip: {
+        pointFormat: '<b>{point.percentage:.1f}%</b> ({point.y:,.1f} $)<br/>',
+        split: true
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+            }
+        }
+    },
+    series: [{
+        name: 'Brands',
+        colorByPoint: true,
+        data: [
+            {% for item in monthly_spendings %}
+                {
+                    name: '{{ item['category'] }}',
+                    y: {{ item['total_amount'] }},
+                },
+            {% endfor %}
+        ]
+    }]
+});
+
+</script>
+
+{% endblock %}

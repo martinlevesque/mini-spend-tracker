@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from sqlalchemy import text
 from db import session
 from lib import statement_decoder
@@ -25,42 +25,117 @@ app.logger.debug('Booting server...')
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # with sqlalchemy, get the list of spendings grouped by category:
+    raw_monthly_spendings = session.execute(text('SELECT '
+                                             'strftime(\'%d-%m\', date) AS \'date\', '
+                                             'category, '
+                                             'SUM(amount) AS total_amount '
+                                             'FROM spendings '
+                                             ' WHERE strftime(\'%Y-%m\', date) = strftime(\'%Y-%m\', date(\'now\')) '
+                                             'GROUP BY strftime(\'%Y-%m\', date), category; '
+                                             '')).all()
+    monthly_spendings = [{'date': r[0], 'category': r[1], 'total_amount': r[2]} for r in raw_monthly_spendings]
+    print(f"monthly_spendings: {monthly_spendings}")
+
+    return render_template('index.html', monthly_spendings=monthly_spendings)
 
 
 @app.route('/spendings/new')
 def spendings_new():
     return render_template('spendings/new.html')
 
+
+def used_categories():
+    raw_categories = session.execute(text(
+        'SELECT DISTINCT category FROM spendings UNION SELECT DISTINCT category FROM rules'
+    )).all()
+
+    db_categories = [r[0] for r in raw_categories]
+
+    return list(set(db_categories + ['skip']))
+
+
 @app.route('/spendings/', methods=['POST'])
 def post_spendings():
     result = []
 
-    # print body
-    # print request.form
-    print(f"date: {request.form}")
     begin_date = request.form['begin_date']
     end_date = request.form['end_date']
     spendings = request.form['spendings']
 
     raw_available_rules = session.execute(text('SELECT pattern, category FROM rules')).all()
-    available_rules = [ { 'pattern': r[0], 'category': r[1] } for r in raw_available_rules]
+    available_rules = [{'pattern': r[0], 'category': r[1]} for r in raw_available_rules]
+    current_id = 0
 
     for spending_line in spendings.split('\n'):
+        current_id += 1
         cur_line = spending_line.strip()
 
         result_decode = statement_decoder.decode_line(cur_line, available_rules)
 
         if result_decode:
             result.append({
+                'id': current_id,
                 'status': 'success',
                 'result': result_decode,
                 'line': cur_line
             })
         else:
             result.append({
+                'id': current_id,
                 'status': 'error',
+                'result': {
+                    'category': '',
+                    'amount': '',
+                    'rule': ''
+                },
                 'line': cur_line
             })
 
-    return render_template('spendings/submission.html', result=result)
+    return render_template('spendings/submission.html',
+                           result=result,
+                           nb_submissions=len(result),
+                           categories=used_categories(),
+                           )
+
+
+@app.route('/spendings/submit', methods=['POST'])
+def finalize_post_spendings():
+    nb_submissions = int(request.form['nb_submissions'])
+
+    for i in range(1, nb_submissions + 1):
+        date = request.form[f'submission[{i}][date]']
+        category = request.form[f'submission[{i}][category]']
+        amount = request.form[f'submission[{i}][amount]']
+        rule_pattern = request.form[f'submission[{i}][rule_pattern]']
+        description = request.form[f'submission[{i}][description]']
+
+        # insert in spendings
+        if category != 'skip' and amount:
+            result_count = session.execute(
+                text('SELECT COUNT(*) as cnt FROM spendings WHERE date = :date AND category = '
+                     ':category AND amount = :amount AND description = :description'),
+                {
+                    'date': date,
+                    'category': category,
+                    'amount': float(amount),
+                    'description': description
+                }
+            ).one()
+
+            if result_count.cnt == 0:
+                session.execute(
+                    text('INSERT INTO spendings (date, category, amount, description) VALUES (:date, :category, '
+                         ':amount, :description) RETURNING *'),
+                    {
+                        'date': date,
+                        'category': category,
+                        'amount': float(amount),
+                        'description': description
+                    }
+                ).one()
+                session.commit()
+            else:
+                app.logger.debug(f"Skipping insertion of {date} {category} {amount} {description}")
+
+    return redirect(url_for('index'))
