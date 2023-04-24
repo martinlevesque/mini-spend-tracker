@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+<h1>Spendings</h1>
+
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Category</th>
+        <th>Description</th>
+        <th>Amount</th>
+    </tr>
+    {% for spending in spendings %}
+        <tr>
+            <td>{{ spending['date'] }}</td>
+            <td>{{ spending['category'] }}</td>
+            <td>{{ spending['description'] }}</td>
+            <td>{{ spending['amount'] }}</td>
+        </tr>
+    {% endfor %}
+
+</table>
+
+{% endblock %}

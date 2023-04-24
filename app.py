@@ -40,6 +40,19 @@ def index():
     return render_template('index.html', monthly_spendings=monthly_spendings)
 
 
+@app.route('/spendings/latest')
+def latest_spendings():
+    raw_spendings = session.execute(text("""
+        SELECT date, amount, description, category
+        FROM spendings 
+        ORDER BY date DESC
+        LIMIT 200
+    """)).all()
+    spendings = [{'date': r[0], 'amount': r[1], 'description': r[2], 'category': r[3]} for r in raw_spendings]
+
+    return render_template('/spendings/latest.html', spendings=spendings)
+
+
 @app.route('/spendings/rules')
 def list_rules():
     rules = session.execute(text('SELECT pattern, category FROM rules')).all()
