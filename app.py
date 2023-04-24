@@ -26,33 +26,31 @@ app.logger.debug('Booting server...')
 @app.route('/')
 def index():
     # with sqlalchemy, get the list of spendings grouped by category:
-    raw_monthly_spendings = session.execute(text('SELECT '
-                                             'strftime(\'%d-%m\', date) AS \'date\', '
-                                             'category, '
-                                             'SUM(amount) AS total_amount '
-                                             'FROM spendings '
-                                             ' WHERE strftime(\'%Y-%m\', date) = strftime(\'%Y-%m\', date(\'now\')) '
-                                             'GROUP BY strftime(\'%Y-%m\', date), category; '
-                                             '')).all()
+    raw_monthly_spendings = session.execute(text("""
+        SELECT 
+            strftime('%d-%m', date) AS 'date', 
+            category, 
+            SUM(amount) AS total_amount 
+        FROM spendings 
+        WHERE strftime('%Y-%m', date) = strftime('%Y-%m', date('now')) 
+        GROUP BY strftime('%Y-%m', date), category; 
+    """)).all()
     monthly_spendings = [{'date': r[0], 'category': r[1], 'total_amount': r[2]} for r in raw_monthly_spendings]
-    print(f"monthly_spendings: {monthly_spendings}")
 
     return render_template('index.html', monthly_spendings=monthly_spendings)
+
+
+@app.route('/spendings/rules')
+def list_rules():
+    rules = session.execute(text('SELECT pattern, category FROM rules')).all()
+    rules = [{'pattern': r[0], 'category': r[1]} for r in rules]
+
+    return render_template('spendings/rules.html', rules=rules)
 
 
 @app.route('/spendings/new')
 def spendings_new():
     return render_template('spendings/new.html')
-
-
-def used_categories():
-    raw_categories = session.execute(text(
-        'SELECT DISTINCT category FROM spendings UNION SELECT DISTINCT category FROM rules'
-    )).all()
-
-    db_categories = [r[0] for r in raw_categories]
-
-    return list(set(db_categories + ['skip']))
 
 
 @app.route('/spendings/', methods=['POST'])
@@ -106,9 +104,16 @@ def finalize_post_spendings():
     for i in range(1, nb_submissions + 1):
         date = request.form[f'submission[{i}][date]']
         category = request.form[f'submission[{i}][category]']
+        new_category = request.form[f'submission[{i}][new_category]']
+
+        if new_category:
+            category = new_category
+
         amount = request.form[f'submission[{i}][amount]']
         rule_pattern = request.form[f'submission[{i}][rule_pattern]']
         description = request.form[f'submission[{i}][description]']
+
+        upsert_rule_pattern(rule_pattern, category)
 
         # insert in spendings
         if category != 'skip' and amount:
@@ -139,3 +144,34 @@ def finalize_post_spendings():
                 app.logger.debug(f"Skipping insertion of {date} {category} {amount} {description}")
 
     return redirect(url_for('index'))
+
+
+def used_categories():
+    raw_categories = session.execute(text(
+        'SELECT DISTINCT category FROM spendings UNION SELECT DISTINCT category FROM rules'
+    )).all()
+
+    db_categories = [r[0] for r in raw_categories]
+
+    return list(set(db_categories + ['skip']))
+
+
+def upsert_rule_pattern(rule_pattern, category):
+    result_count = session.execute(
+        text('SELECT COUNT(*) as cnt FROM rules WHERE pattern = :pattern'),
+        {
+            'pattern': rule_pattern
+        }
+    ).one()
+
+    if result_count.cnt == 0:
+        session.execute(
+            text('INSERT INTO rules (pattern, category) VALUES (:pattern, :category) RETURNING *'),
+            {
+                'pattern': rule_pattern,
+                'category': category
+            }
+        ).one()
+        session.commit()
+    else:
+        app.logger.debug(f"Skipping insertion of {rule_pattern} {category}")

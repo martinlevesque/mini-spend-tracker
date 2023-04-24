@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+<h1>Rules</h1>
+
+<table border="1">
+    <tr>
+        <th>Rule pattern</th>
+        <th>Category</th>
+    </tr>
+
+    {% for rule in rules %}
+        <tr>
+            <td>{{ rule['pattern'] }}</td>
+            <td>{{ rule['category'] }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

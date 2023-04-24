@@ -20,7 +20,7 @@
 
             </div>
             <div>
-                <label for="{{ entry['id'] }}_rule_pattern">Rule pattern:</label>
+                <label for="{{ entry['id'] }}_rule_pattern">Rule pattern (<a target="_blank" href="/spendings/rules">see all rules</a>):</label>
                 <input type="text"
                        id="{{ entry['id'] }}_rule_pattern"
                        name="submission[{{ entry['id'] }}][rule_pattern]"
@@ -40,6 +40,7 @@
                         </option>
                     {% endfor %}
                 </select>
+                <input type="text" name="submission[{{ entry['id'] }}][new_category]" value="" placeholder="New category" />
             </div>
             <div>
                 <label for="{{ entry['id'] }}_date">Date:</label>
