@@ -1,0 +1,18 @@
+version: "3"
+services:
+  mini-spend-tracker:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint:
+      - gunicorn
+      - app:app
+      - --log-level=DEBUG
+      - --bind=0.0.0.0:5555
+    environment:
+      ENV: production
+      FLASK_APP: ./app.py
+    network_mode: host
+    volumes:
+      - ./db:/app/db
