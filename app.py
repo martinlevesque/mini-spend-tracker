@@ -131,14 +131,14 @@ def finalize_post_spendings():
             if result_count.cnt == 0:
                 session.execute(
                     text('INSERT INTO spendings (date, category, amount, description) VALUES (:date, :category, '
-                         ':amount, :description) RETURNING *'),
+                         ':amount, :description)'),
                     {
                         'date': date,
                         'category': category,
                         'amount': float(amount),
                         'description': description
                     }
-                ).one()
+                )
                 session.commit()
             else:
                 app.logger.debug(f"Skipping insertion of {date} {category} {amount} {description}")
@@ -157,6 +157,9 @@ def used_categories():
 
 
 def upsert_rule_pattern(rule_pattern, category):
+    if not rule_pattern or not category:
+        return
+
     result_count = session.execute(
         text('SELECT COUNT(*) as cnt FROM rules WHERE pattern = :pattern'),
         {
@@ -166,12 +169,12 @@ def upsert_rule_pattern(rule_pattern, category):
 
     if result_count.cnt == 0:
         session.execute(
-            text('INSERT INTO rules (pattern, category) VALUES (:pattern, :category) RETURNING *'),
+            text('INSERT INTO rules (pattern, category) VALUES (:pattern, :category)'),
             {
                 'pattern': rule_pattern,
                 'category': category
             }
-        ).one()
+        )
         session.commit()
     else:
         app.logger.debug(f"Skipping insertion of {rule_pattern} {category}")
