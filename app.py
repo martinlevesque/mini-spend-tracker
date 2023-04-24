@@ -53,6 +53,28 @@ def latest_spendings():
     return render_template('/spendings/latest.html', spendings=spendings)
 
 
+@app.route('/spendings/delete')
+def delete_spending():
+    date = request.args.get('date')
+    amount = request.args.get('amount')
+    category = request.args.get('category')
+
+    session.execute(text("""
+        DELETE 
+        FROM spendings 
+        WHERE date = :date AND amount = :amount AND category = :category
+    """),
+                                    {
+                                        'date': date,
+                                        'amount': amount,
+                                        'category': category
+                                    })
+
+    session.commit()
+
+    return redirect(url_for('latest_spendings'))
+
+
 @app.route('/spendings/rules')
 def list_rules():
     rules = session.execute(text('SELECT pattern, category FROM rules')).all()

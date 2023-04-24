@@ -10,6 +10,7 @@
         <th>Category</th>
         <th>Description</th>
         <th>Amount</th>
+        <th>Actions</th>
     </tr>
     {% for spending in spendings %}
         <tr>
@@ -17,6 +18,11 @@
             <td>{{ spending['category'] }}</td>
             <td>{{ spending['description'] }}</td>
             <td>{{ spending['amount'] }}</td>
+            <td>
+                <ul>
+                    <li><a onclick="return confirm('are you sure?')" href="/spendings/delete?date={{ spending['date'] }}&category={{ spending['category'] }}&amount={{ spending['amount'] }}">Delete</a></li>
+                </ul>
+            </td>
         </tr>
     {% endfor %}
 
