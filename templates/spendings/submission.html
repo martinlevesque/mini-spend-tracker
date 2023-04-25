@@ -63,7 +63,7 @@
                 <input type="text"
                        id="{{ entry['id'] }}_amount"
                        name="submission[{{ entry['id'] }}][amount]"
-                       value=""
+                       value="{{ entry['result']['amount'] }}"
                        placeholder="" />
             </div>
         </fieldset>
