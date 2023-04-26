@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for
 from sqlalchemy import text
 from db import session
@@ -111,6 +112,7 @@ def post_spendings():
                 'id': current_id,
                 'status': 'success',
                 'result': result_decode,
+                'date': build_up_date_s(p_day=result_decode['day']),
                 'line': cur_line
             })
         else:
@@ -122,6 +124,7 @@ def post_spendings():
                     'amount': '',
                     'rule': ''
                 },
+                'date': '',
                 'line': cur_line
             })
 
@@ -179,6 +182,17 @@ def finalize_post_spendings():
                 app.logger.debug(f"Skipping insertion of {date} {category} {amount} {description}")
 
     return redirect(url_for('index'))
+
+
+def build_up_date_s(p_day=None):
+    year = datetime.now().year
+    month = datetime.now().month
+    day = datetime.now().day
+
+    if p_day:
+        day = int(p_day)
+
+    return datetime(year, month, day).strftime('%Y-%m-%d')
 
 
 def used_categories():

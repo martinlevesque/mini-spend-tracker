@@ -10,10 +10,7 @@ def decode_line(line, rules):
 
         category = rule['category']
 
-        print(f"pattern: {pattern}")
-        print(f"line: {line}")
         result_search = re.search(pattern, line)
-        print(f"result_search: {result_search}")
 
         if not result_search:
             continue
