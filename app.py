@@ -124,7 +124,7 @@ def post_spendings():
                     'amount': '',
                     'rule': ''
                 },
-                'date': '',
+                'date': build_up_date_s(),
                 'line': cur_line
             })
 
