@@ -196,7 +196,6 @@ def build_up_date_s(p_day=None, p_month=None):
     if p_month and date_util.convert_month(p_month):
         month = date_util.convert_month(p_month)
 
-    print(f"month = {month}, day = {day}")
     return datetime(year, month, day).strftime('%Y-%m-%d')
 
 
