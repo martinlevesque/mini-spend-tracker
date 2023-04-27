@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from sqlalchemy import text
 from db import session
 from lib import statement_decoder
+from lib import date_util
 
 # Data model
 
@@ -112,7 +113,7 @@ def post_spendings():
                 'id': current_id,
                 'status': 'success',
                 'result': result_decode,
-                'date': build_up_date_s(p_day=result_decode['day']),
+                'date': build_up_date_s(p_day=result_decode['day'], p_month=result_decode['month']),
                 'line': cur_line
             })
         else:
@@ -184,7 +185,7 @@ def finalize_post_spendings():
     return redirect(url_for('index'))
 
 
-def build_up_date_s(p_day=None):
+def build_up_date_s(p_day=None, p_month=None):
     year = datetime.now().year
     month = datetime.now().month
     day = datetime.now().day
@@ -192,6 +193,10 @@ def build_up_date_s(p_day=None):
     if p_day:
         day = int(p_day)
 
+    if p_month and date_util.convert_month(p_month):
+        month = date_util.convert_month(p_month)
+
+    print(f"month = {month}, day = {day}")
     return datetime(year, month, day).strftime('%Y-%m-%d')
 
 
