@@ -108,8 +108,6 @@ def spendings_new():
 def post_spendings():
     result = []
 
-    begin_date = request.form['begin_date']
-    end_date = request.form['end_date']
     spendings = request.form['spendings']
 
     raw_available_rules = session.execute(text('SELECT pattern, category FROM rules')).all()
