@@ -1,3 +1,4 @@
+import calendar
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for
 from sqlalchemy import text
@@ -27,6 +28,16 @@ app.logger.debug('Booting server...')
 
 @app.route('/')
 def index():
+    begin_date = request.args.get('begin_date')
+
+    if not begin_date:
+        begin_date = beginning_of_month_s()
+
+    end_date = request.args.get('end_date')
+
+    if not end_date:
+        end_date = end_of_month_s()
+
     # with sqlalchemy, get the list of spendings grouped by category:
     raw_monthly_spendings = session.execute(text("""
         SELECT 
@@ -34,12 +45,15 @@ def index():
             category, 
             SUM(amount) AS total_amount 
         FROM spendings 
-        WHERE strftime('%Y-%m', date) = strftime('%Y-%m', date('now')) 
+        WHERE strftime('%Y-%m-%d', date) BETWEEN :begin_date AND :end_date
         GROUP BY strftime('%Y-%m', date), category; 
-    """)).all()
+    """), {'begin_date': begin_date, 'end_date': end_date}).all()
     monthly_spendings = [{'date': r[0], 'category': r[1], 'total_amount': r[2]} for r in raw_monthly_spendings]
 
-    return render_template('index.html', monthly_spendings=monthly_spendings)
+    return render_template('index.html',
+                           monthly_spendings=monthly_spendings,
+                           begin_date=begin_date,
+                           end_date=end_date)
 
 
 @app.route('/spendings/latest')
@@ -66,11 +80,11 @@ def delete_spending():
         FROM spendings 
         WHERE date = :date AND amount = :amount AND category = :category
     """),
-                                    {
-                                        'date': date,
-                                        'amount': amount,
-                                        'category': category
-                                    })
+                    {
+                        'date': date,
+                        'amount': amount,
+                        'category': category
+                    })
 
     session.commit()
 
@@ -197,6 +211,18 @@ def build_up_date_s(p_day=None, p_month=None):
         month = date_util.convert_month(p_month)
 
     return datetime(year, month, day).strftime('%Y-%m-%d')
+
+
+def beginning_of_month_s():
+    # in format YYYY-MM-DD
+    return datetime.now().strftime('%Y-%m-01')
+
+
+def end_of_month_s():
+    res = calendar.monthrange(datetime.now().year, datetime.now().month)
+    day = res[1]
+
+    return datetime(datetime.now().year, datetime.now().month, day).strftime('%Y-%m-%d')
 
 
 def used_categories():
