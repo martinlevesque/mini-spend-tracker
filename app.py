@@ -38,7 +38,15 @@ def index():
     if not end_date:
         end_date = end_of_month_s()
 
-    # with sqlalchemy, get the list of spendings grouped by category:
+    return render_template('index.html',
+                           monthly_spendings=monthly_spendings(begin_date, end_date),
+                           evolution_spendings=evolution_spendings(begin_date, end_date),
+                           begin_date=begin_date,
+                           end_date=end_date)
+
+
+def monthly_spendings(begin_date, end_date):
+    # the list of spendings grouped by category for the current period:
     raw_monthly_spendings = session.execute(text("""
         SELECT 
             strftime('%d-%m', date) AS 'date', 
@@ -46,14 +54,48 @@ def index():
             SUM(amount) AS total_amount 
         FROM spendings 
         WHERE strftime('%Y-%m-%d', date) BETWEEN :begin_date AND :end_date
-        GROUP BY strftime('%Y-%m', date), category; 
+        GROUP BY category; 
     """), {'begin_date': begin_date, 'end_date': end_date}).all()
     monthly_spendings = [{'date': r[0], 'category': r[1], 'total_amount': r[2]} for r in raw_monthly_spendings]
 
-    return render_template('index.html',
-                           monthly_spendings=monthly_spendings,
-                           begin_date=begin_date,
-                           end_date=end_date)
+    return monthly_spendings
+
+
+def evolution_spendings(begin_date, end_date):
+    raw_evolution_spendings = session.execute(text("""
+        SELECT 
+            strftime('%Y', date) AS 'year', 
+            strftime('%m', date) AS 'month', 
+            strftime('%d', date) AS 'day', 
+            category, 
+            SUM(amount) AS total_amount 
+        FROM spendings 
+        WHERE strftime('%Y-%m-%d', date) BETWEEN :begin_date AND :end_date
+        GROUP BY strftime('%Y-%m', date), category; 
+    """), {'begin_date': begin_date, 'end_date': end_date}).all()
+
+    evolution_spendings = [
+        {
+            'year': r[0],
+            'month': r[1],
+            'day': r[2],
+            'category': r[3],
+            'total_amount': r[4]
+        }
+        for r in raw_evolution_spendings
+    ]
+
+    result_evolution_spendings = {}
+
+    for s in evolution_spendings:
+        category = s['category']
+
+        if category not in result_evolution_spendings:
+            result_evolution_spendings[category] = []
+
+        result_evolution_spendings[category].append(s)
+
+    return result_evolution_spendings
 
 
 @app.route('/spendings/latest')

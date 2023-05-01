@@ -92,4 +92,70 @@
 
 </script>
 
+<div id="container-evolution">
+
+</div>
+
+<script>
+    Highcharts.chart('container-evolution', {
+    chart: {
+        type: 'area'
+    },
+    title: {
+        useHTML: true,
+        text: 'Spendings evolution over time',
+        align: 'left'
+    },
+    subtitle: {
+        text: '',
+        align: 'left'
+    },
+    accessibility: {
+        point: {
+            valueDescriptionFormat: '<b>{point.percentage:.1f}%</b> ({point.y:,.1f} $)<br/>'
+        }
+    },
+    xAxis: {
+        type: 'datetime',
+        tickInterval: 30 * 24 * 3600 * 1000,
+        dateTimeLabelFormats: {
+            month: '%b %Y'
+        }
+    },
+    yAxis: {
+        title: {
+            text: 'Values'
+        }
+    },
+    series: [
+        {% for category, values in evolution_spendings.items() %}
+            {
+                type: 'area',
+                name: '{{ category }}',
+                data: [
+                        {% for value in values %}
+                            [Date.UTC({{ value['year'] }}, {{ value['month'] }}, 1), {{ value['total_amount'] }}],
+                        {% endfor %}
+                    ]
+            },
+        {% endfor %}
+    ],
+    tooltip: {
+        pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.percentage:.1f}%</b> ({point.y:,.1f} $)<br/>',
+        split: true
+    },
+    plotOptions: {
+        series: {
+        },
+        area: {
+            stacking: 'percent',
+            marker: {
+                enabled: false
+            }
+        }
+    }
+});
+
+</script>
+
 {% endblock %}
