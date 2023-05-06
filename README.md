@@ -7,7 +7,7 @@ Data is stored in a SQLite database (`db/schema.db` can be cloned to create a ne
 
 - Minimalistic HTTP server, to add daily spendings per category.
 - A dashboard allows to display the current month spendings per category, and the spendings variations over previous months.
-- Rule patterns can be created allowing to simply add spendings coming from bank statements.
+- Rule patterns can be created allowing to simply add spendings coming from bank statements. Rule patterns can be created under "Add new spendings".
 
 Example rule pattern:
 ```
