@@ -42,7 +42,7 @@
     },
     title: {
         useHTML: true,
-        text: 'Current month spendings',
+        text: 'Current month spendings (Total: {{ monthly_spendings['total'] }} $)',
         align: 'left'
     },
     subtitle: {
@@ -80,7 +80,7 @@
         name: 'Brands',
         colorByPoint: true,
         data: [
-            {% for item in monthly_spendings %}
+            {% for item in monthly_spendings['spendings'] %}
                 {
                     name: '{{ item['category'] }}',
                     y: {{ item['total_amount'] }},

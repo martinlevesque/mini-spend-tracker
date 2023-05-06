@@ -13,6 +13,7 @@ services:
     environment:
       ENV: production
       FLASK_APP: ./app.py
+      DB_FILENAME: spendings.db
     network_mode: host
     volumes:
       - ./db:/app/db

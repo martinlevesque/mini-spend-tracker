@@ -6,25 +6,9 @@ from db import session
 from lib import statement_decoder
 from lib import date_util
 
-# Data model
-
-## rules
-### - pattern (string)
-### - category (string)
-
-## spendings
-### - date (datetime)
-### - amount (float)
-### - category (string)
-
-### indexes: (spendings.date), (spendings.date, spendings.category)
-
 app = Flask(__name__)
 
 app.logger.debug('Booting server...')
-
-
-# https://www.highcharts.com/blog/download/
 
 @app.route('/')
 def index():
@@ -58,7 +42,10 @@ def monthly_spendings(begin_date, end_date):
     """), {'begin_date': begin_date, 'end_date': end_date}).all()
     monthly_spendings = [{'date': r[0], 'category': r[1], 'total_amount': r[2]} for r in raw_monthly_spendings]
 
-    return monthly_spendings
+    return {
+        "spendings": monthly_spendings,
+        "total": sum([s['total_amount'] for s in monthly_spendings])
+    }
 
 
 def evolution_spendings(begin_date, end_date):
