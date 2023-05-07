@@ -4,17 +4,19 @@
 
 <h1>New Spendings</h1>
 
-<form method="POST" class="pure-form pure-form-aligned" action="/spendings/">
+<form method="POST" class="" action="/spendings/">
     <fieldset>
 
-        <div>
+        <div class="form-field">
             <label for="spendings">Paste your spendings (one per line):</label>
-            <textarea
-                    style="max-width: 100%; width: 100%; height: 800px;" id="spendings" name="spendings" placeholder=""></textarea>
+            <div>
+                <textarea
+                        style="max-width: 100%; width: 100%; height: 500px;" id="spendings" name="spendings" placeholder=""></textarea>
+            </div>
         </div>
     </fieldset>
 
-    <button type="submit" class="pure-button pure-button-primary">Submit</button>
+    <button type="submit">Submit</button>
 </form>
 
 {% endblock %}

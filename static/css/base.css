@@ -1,4 +1,46 @@
 
-input {
-    width: 75%;
+.form-field {
+    margin-bottom: 1.5rem;
+
 }
+
+.form-field input {
+  border-radius: 20px;
+  border: 1px solid #2d9fd9;
+  font-size: 24px;
+  padding: 10px;
+  width: 90%;
+}
+
+.form-field textarea {
+  border-radius: 20px;
+  border: 1px solid #2d9fd9;
+  font-size: 24px;
+  padding: 10px;
+}
+
+.form-field select {
+  border-radius: 20px;
+  border: 1px solid #2d9fd9;
+  font-size: 24px;
+  padding: 10px;
+  width: 92%;
+}
+
+.form-field label {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: block;
+}
+
+form button {
+    background-color: #2d9fd9;
+    border: 1px solid #2d9fd9;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 24px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+

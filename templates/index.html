@@ -2,24 +2,30 @@
 
 {% block body %}
 
-<form method="GET" class="pure-form pure-form-aligned" action="/">
+<form method="GET" action="/">
     <div>
-        <div>
+        <div class="form-field">
             <label for="begin_date">Begin date:<br /></label>
-            <input type="date" id="begin_date"
-                   name="begin_date"
-                   placeholder="Begin date"
-                   value="{{ begin_date }}" />
+
+            <div>
+                <input type="date" id="begin_date"
+                       name="begin_date"
+                       placeholder="Begin date"
+                       value="{{ begin_date }}" />
+            </div>
         </div>
-        <div>
+        <div class="form-field">
             <label for="end_date">End date:<br /></label>
-            <input type="date" id="end_date" name="end_date" placeholder="End date" value="{{ end_date }}" />
+
+            <div>
+                <input type="date" id="end_date" name="end_date" placeholder="End date" value="{{ end_date }}" />
+            </div>
         </div>
     </div>
 
     <div>
         <hr />
-        <input style="width: 100px;" type="submit" value="Submit" />
+        <button type="submit">Calculate</button>
         <hr />
     </div>
 </form>

@@ -17,54 +17,73 @@
                         <span style="color: red;">No match</span>
                     {% endif %}
                 </b>
-
+                <br /><br />
             </div>
-            <div>
+            <div class="form-field">
                 <label for="{{ entry['id'] }}_rule_pattern">Rule pattern (<a target="_blank" href="/spendings/rules">see all rules</a>):</label>
-                <input type="text"
-                       id="{{ entry['id'] }}_rule_pattern"
-                       name="submission[{{ entry['id'] }}][rule_pattern]"
-                       value="{{ entry['result']['rule'] }}"
-                       placeholder="" />
+                <div>
+                    <input type="text"
+                           id="{{ entry['id'] }}_rule_pattern"
+                           name="submission[{{ entry['id'] }}][rule_pattern]"
+                           value="{{ entry['result']['rule'] }}"
+                           placeholder="" />
+                    <div>
+                        Example:
+                        <pre>{"pattern": "^begin (\\d+) (.{3}) (\\d+) test (\\d+.\\d+)$", "variable_positions": {"day": 0, "month": 1, "year": 2, "amount": 3}}</pre>
+                    </div>
+                </div>
             </div>
-            <div>
-                <label for="{{ entry['id'] }}_category">Category:</label>
-                <select id="{{ entry['id'] }}_category" name="submission[{{ entry['id'] }}][category]">
-                    {% for category in categories %}
+            <div class="form-field">
+                <label for="{{ entry['id'] }}_category">Category*:</label>
+                <div>
+                    <select required id="{{ entry['id'] }}_category" name="submission[{{ entry['id'] }}][category]">
+                        {% for category in categories %}
                         <option value="{{ category }}"
                                 {% if entry['result']['category'] == category %}
-                                    selected
-                                {% endif %}
+                        selected
+                        {% endif %}
                         >
-                            {{ category }}
+                        {{ category }}
                         </option>
-                    {% endfor %}
-                </select>
-                <input type="text" name="submission[{{ entry['id'] }}][new_category]" value="" placeholder="New category" />
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <input type="text" name="submission[{{ entry['id'] }}][new_category]" value="" placeholder="or create a new category" />
+                </div>
             </div>
-            <div>
-                <label for="{{ entry['id'] }}_date">Date:</label>
-                <input type="date"
-                       id="{{ entry['id'] }}_date"
-                       name="submission[{{ entry['id'] }}][date]"
-                       value="{{ entry['date'] }}"
-                       placeholder="" />
+            <div class="form-field">
+                <label for="{{ entry['id'] }}_date">Date*:</label>
+                <div>
+                    <input required type="date"
+                           id="{{ entry['id'] }}_date"
+                           name="submission[{{ entry['id'] }}][date]"
+                           value="{{ entry['date'] }}"
+                           placeholder="" />
+                </div>
             </div>
-            <div>
-                <label for="{{ entry['id'] }}_description">Description:</label>
-                <input type="text"
-                       id="{{ entry['id'] }}_description"
-                       name="submission[{{ entry['id'] }}][description]"
-                       value="{{ entry['line'] }}"
-                       placeholder="" />
+            <div class="form-field">
+                <label for="{{ entry['id'] }}_description">Description*:</label>
+                <div>
+                    <input required type="text"
+                           id="{{ entry['id'] }}_description"
+                           name="submission[{{ entry['id'] }}][description]"
+                           value="{{ entry['line'] }}"
+                           placeholder="" />
+                </div>
             </div>
-            <div>
+            <div class="form-field">
                 <label for="{{ entry['id'] }}_amount">Amount:</label>
-                <input type="text"
-                       id="{{ entry['id'] }}_amount"
-                       name="submission[{{ entry['id'] }}][amount]"
-                       value="{{ entry['result']['amount'] }}"
-                       placeholder="" />
+                <div>
+                    <input required type="text"
+                           id="{{ entry['id'] }}_amount"
+                           name="submission[{{ entry['id'] }}][amount]"
+                           value="{{ entry['result']['amount'] }}"
+                           placeholder="" />
+                </div>
+            </div>
+            <div>
+                <hr />
             </div>
         </fieldset>
     {% endfor %}
