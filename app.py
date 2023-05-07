@@ -10,6 +10,7 @@ app = Flask(__name__)
 
 app.logger.debug('Booting server...')
 
+
 @app.route('/')
 def index():
     begin_date = request.args.get('begin_date')
@@ -40,11 +41,11 @@ def monthly_spendings(begin_date, end_date):
         WHERE strftime('%Y-%m-%d', date) BETWEEN :begin_date AND :end_date
         GROUP BY category; 
     """), {'begin_date': begin_date, 'end_date': end_date}).all()
-    monthly_spendings = [{'date': r[0], 'category': r[1], 'total_amount': r[2]} for r in raw_monthly_spendings]
+    all_monthly_spendings = [{'date': r[0], 'category': r[1], 'total_amount': r[2]} for r in raw_monthly_spendings]
 
     return {
-        "spendings": monthly_spendings,
-        "total": sum([s['total_amount'] for s in monthly_spendings])
+        "spendings": all_monthly_spendings,
+        "total": sum([s['total_amount'] for s in all_monthly_spendings])
     }
 
 
@@ -61,7 +62,7 @@ def evolution_spendings(begin_date, end_date):
         GROUP BY strftime('%Y-%m', date), category; 
     """), {'begin_date': begin_date, 'end_date': end_date}).all()
 
-    evolution_spendings = [
+    evolution_spendings_list = [
         {
             'year': r[0],
             'month': r[1],
@@ -74,7 +75,7 @@ def evolution_spendings(begin_date, end_date):
 
     result_evolution_spendings = {}
 
-    for s in evolution_spendings:
+    for s in evolution_spendings_list:
         category = s['category']
 
         if category not in result_evolution_spendings:
@@ -88,31 +89,30 @@ def evolution_spendings(begin_date, end_date):
 @app.route('/spendings/latest')
 def latest_spendings():
     raw_spendings = session.execute(text("""
-        SELECT date, amount, description, category
+        SELECT date, amount, description, category, rowid
         FROM spendings 
         ORDER BY date DESC
         LIMIT 200
     """)).all()
-    spendings = [{'date': r[0], 'amount': r[1], 'description': r[2], 'category': r[3]} for r in raw_spendings]
+    spendings = [
+        {'date': r[0], 'amount': r[1], 'description': r[2], 'category': r[3], 'rowid': r[4]}
+        for r in raw_spendings
+    ]
 
     return render_template('/spendings/latest.html', spendings=spendings)
 
 
 @app.route('/spendings/delete')
 def delete_spending():
-    date = request.args.get('date')
-    amount = request.args.get('amount')
-    category = request.args.get('category')
+    rowid = request.args.get('rowid')
 
     session.execute(text("""
         DELETE 
         FROM spendings 
-        WHERE date = :date AND amount = :amount AND category = :category
+        WHERE rowid = :rowid
     """),
                     {
-                        'date': date,
-                        'amount': amount,
-                        'category': category
+                        'rowid': rowid
                     })
 
     session.commit()

@@ -20,7 +20,7 @@
             <td>{{ spending['amount'] }}</td>
             <td>
                 <ul>
-                    <li><a onclick="return confirm('are you sure?')" href="/spendings/delete?date={{ spending['date'] }}&category={{ spending['category'] }}&amount={{ spending['amount'] }}">Delete</a></li>
+                    <li><a onclick="return confirm('are you sure?')" href="/spendings/delete?rowid={{ spending['rowid'] }}">Delete</a></li>
                 </ul>
             </td>
         </tr>
