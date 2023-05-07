@@ -22,6 +22,13 @@ begin 18 january test 10
 
 the server will add a spending of 10$ on the 18th of January.
 
+## Screenshots
+
+Main dashboard:
+
+![image](https://user-images.githubusercontent.com/8007722/236646787-d18dcb44-2359-49f9-a6d7-3127270794aa.png)
+
+
 ## Installation
 
 - Clone the repository
