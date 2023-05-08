@@ -44,3 +44,25 @@ form button {
     cursor: pointer;
 }
 
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    border: 1px solid #2d9fd9;
+    padding: 10px;
+    text-align: left;
+    font-size: 24px;
+}
+
+th {
+    font-weight: bold;
+    background-color: #2d9fd9;
+    color: #fff;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
