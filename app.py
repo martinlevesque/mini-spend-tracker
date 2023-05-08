@@ -154,7 +154,7 @@ def post_spendings():
                 'id': current_id,
                 'status': 'success',
                 'result': result_decode,
-                'date': build_up_date_s(p_day=result_decode['day'], p_month=result_decode['month']),
+                'date': build_up_date_s(p_day=result_decode.get('day'), p_month=result_decode.get('month')),
                 'line': cur_line
             })
         else:
