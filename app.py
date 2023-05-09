@@ -2,7 +2,7 @@ import calendar
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for
 from sqlalchemy import text
-from db import session
+from db import session, setup_db
 from lib import statement_decoder
 from lib import date_util
 
@@ -88,16 +88,17 @@ def evolution_spendings(begin_date, end_date):
 
 @app.route('/spendings/latest')
 def latest_spendings():
-    raw_spendings = session.execute(text("""
-        SELECT date, amount, description, category, rowid
-        FROM spendings 
-        ORDER BY date DESC
-        LIMIT 200
-    """)).all()
-    spendings = [
-        {'date': r[0], 'amount': r[1], 'description': r[2], 'category': r[3], 'rowid': r[4]}
-        for r in raw_spendings
-    ]
+    with setup_db() as conn:
+        raw_spendings = conn.execute(text("""
+            SELECT date, amount, description, category, rowid
+            FROM spendings 
+            ORDER BY date DESC
+            LIMIT 200
+        """)).all()
+        spendings = [
+            {'date': r[0], 'amount': r[1], 'description': r[2], 'category': r[3], 'rowid': r[4]}
+            for r in raw_spendings
+        ]
 
     return render_template('/spendings/latest.html', spendings=spendings)
 
